@@ -9,7 +9,7 @@ import sys
 from datetime import datetime
 
 sys.path.append('../')
-print(sys.path)
+#print(sys.path)
 load_dotenv()
 llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 
@@ -19,7 +19,7 @@ class FormParser(BaseParser):
         self.doc_id = docid
         
         self.document_index_list,self.document_index = self.load_document_index()
-        print(self.document_index)
+        #print(self.document_index)
         self.pdf_path = self.document_index[self.doc_id]["path"]
         self.doc_type = self.document_index[self.doc_id]["doc_type"]
         self.first_parse_path = self.document_index[self.doc_id]["first_parse_path"]
