@@ -1,0 +1,41 @@
+[
+  {
+    "doc_id": "w2_2025",
+    "path": "Data/W2_form.pdf",
+    "doc_type": "W-2",
+    "doc_role": "fact_source",
+    "tax_year": 2025,
+    "first_parse_path": "first_parsed_doc/W2_form_parsed.json",
+    "schema_parse_path": "schema_parsed_doc/W2_form_schema_parsed.json"
+  },
+  {
+    "doc_id": "int1099_2025",
+    "path": "Data/INT1099_form.pdf",
+    "doc_type": "1099-INT",
+    "doc_role": "fact_source",
+    "tax_year": 2025,
+    "first_parse_path": "first_parsed_doc/INT1099_form_parsed.json",
+    "schema_parse_path": "schema_parsed_doc/INT1099_form_schema_parsed.json"
+  },
+  {
+    "doc_id": "irs_1099_int_explainer",
+    "path": "Data/understanding_irs_int1099.pdf",
+    "doc_type": "IRS_EXPLANATION",
+    "doc_role": "explanation",
+    "topic": "1099-INT"
+  },
+  {
+    "doc_id": "irs_w2_explainer",
+    "path": "Data/understanding_irs_w2.pdf",
+    "doc_type": "IRS_EXPLANATION",
+    "doc_role": "explanation",
+    "topic": "W-2"
+  },
+  {
+    "doc_id": "big_beautiful_bill",
+    "path": "Data/understanding_big_beautiful_bill.pdf",
+    "doc_type": "LAW",
+    "doc_role": "reference",
+    "topic": "tax_law"
+  }
+]
