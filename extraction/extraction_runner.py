@@ -3,6 +3,7 @@ from base_extraction import BaseParser
 from explainer_doc_extraction import ExplainerDocumentParser
 from datetime import datetime
 
+
 class ExtractionRunner(BaseParser):
      def __init__(self):
         super().__init__()
@@ -30,6 +31,7 @@ class ExtractionRunner(BaseParser):
         explanation_docs, fact_source_docs, reference_docs = self.select_docs()
         print("Explanation Docs:", explanation_docs)
         # Extract and parse 1099-INT form
+        all_explainer_chunks = []
         for doc in fact_source_docs:
             docid = doc["doc_id"]
             #print("Document ID:", docid)
@@ -50,6 +52,9 @@ class ExtractionRunner(BaseParser):
             explainer_chunks = explainer_parser.load_chunks(explainer_pages)
             print("Explainer Chunks:", explainer_chunks[0])
             # embedding and saving
+            all_explainer_chunks.extend(explainer_chunks)
+        vector_store = explainer_parser.build_vectorstore(all_explainer_chunks)
+        explainer_parser.save_vectorstore(vector_store, "explainer_vectorstore.faiss")
 
 
 if __name__ == "__main__":

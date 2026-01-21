@@ -6,6 +6,10 @@ from langchain_openai import ChatOpenAI
 from dotenv import load_dotenv
 import sys
 from datetime import datetime
+from langchain_openai import OpenAIEmbeddings
+from langchain.vectorstores import FAISS
+
+
 
 sys.path.append('../')
 #print(sys.path)
@@ -21,6 +25,8 @@ class ExplainerDocumentParser(BaseParser):
         #print(self.document_index)
         self.pdf_path = self.document_index[self.doc_id]["path"]
         self.doc_type = self.document_index[self.doc_id]["doc_type"]
+        self.doc_role = self.document_index[self.doc_id]["doc_role"]
+        self.topic = self.document_index[self.doc_id].get("topic", "General")
 
     
     def strip_boilerplate(self,text):
@@ -98,13 +104,53 @@ class ExplainerDocumentParser(BaseParser):
                 for idx, chunk in enumerate(chunks):
                     all_chunks.append({
                     "doc_id": self.doc_id,
+                    "doc_role": self.doc_role,
                     "doc_type": self.doc_type,
+                    "topic": self.topic,
                     "page_number": page_number,
                     "section_title": section_title,
                     "chunk_index": idx + 1,
                     "text": chunk
                     })
         return all_chunks
+    
+    def prepare_corpus(self,chunks):
+        texts = [c["text"] for c in chunks]
+        metadatas = [
+            {
+            "doc_id": c["doc_id"],
+            "doc_role": c["doc_role"],  
+            "doc_type": c["doc_type"],   
+            "topic": c["topic"],               
+            "section_title": c["section_title"],
+            "page_number": c["page_number"],
+            "chunk_index": c["chunk_index"]
+            }
+            for c in chunks
+        ]
+        return texts, metadatas
+    
+    def build_vectorstore(self,chunks):
+        texts, metadatas = self.prepare_corpus(chunks)
+
+        embeddings = OpenAIEmbeddings(
+            model="text-embedding-3-large"
+        )
+
+        vectorstore = FAISS.from_texts(
+            texts=texts,
+            metadatas=metadatas,
+            embedding=embeddings
+        )
+
+        return vectorstore
+    
+    def save_vectorstore(self,vectorstore, filepath):
+        vectorstore.save_local(filepath)
+
+
+    
+    
 
 
 
