@@ -1,7 +1,10 @@
 from langchain_core.tools import tool, BaseTool
 from typing import Optional, Union, List
 from extraction.schema import SCHEMA_REGISTRY,ExtractedDocument
-from tool_format import DocumentQuery, FIELD_SYNONYMS, FactResult
+from .tool_format import DocumentQuery, FIELD_SYNONYMS, FactResult
+from .helper import load_parsed_docs
+
+PARSED_FORM_DOCUMENTS = load_parsed_docs("schema_parsed_doc")
 
 def map_question_to_field(
     question: str,
@@ -10,6 +13,7 @@ def map_question_to_field(
     q = question.lower()
 
     schema_cls = SCHEMA_REGISTRY.get(doc_type)
+    print("Mapping question to field for doc_type:", doc_type)
     if not schema_cls:
         return None
 
@@ -31,7 +35,8 @@ def lookup_structured_fact(
     """
     Deterministically retrieve a structured field from parsed schema documents.
     """
-
+    print("Looking up field:", field_name, "in doc_type:", doc_type)
+    print("Parsed docs count:", len(parsed_docs))
     results: List[FactResult] = []
 
     for doc in parsed_docs:
@@ -43,11 +48,14 @@ def lookup_structured_fact(
             continue  # unknown form, skip safely
 
         fields_obj = doc.fields
+        print("fields_obj:", fields_obj)
 
-        if not hasattr(fields_obj, field_name):
+        if field_name not in fields_obj:
+            print("Field", field_name, "not found in document fields.")
             continue
 
-        field = getattr(fields_obj, field_name)
+        field = fields_obj[field_name]
+        print("Found field:", field_name, "with value:", field.value if field else None)
 
         if field is None or field.value is None:
             continue
@@ -66,16 +74,19 @@ def lookup_structured_fact(
 
 
 @tool
-def form_doc_retriever_tool(query: DocumentQuery, parsed_docs: List[ExtractedDocument]) -> str:
+def form_doc_retriever_tool(query: DocumentQuery) -> str:
+    """Tool to retrieve facts (fields from a form) based on a query."""
     field_name = map_question_to_field(
         question=query.question,
         doc_type=query.doc_type
     )
+    print("Mapped question to field name:", field_name)
     if not field_name:
         return []
+    
 
     return lookup_structured_fact(
-        parsed_docs=parsed_docs,
+        parsed_docs=PARSED_FORM_DOCUMENTS,
         field_name=field_name,
         doc_type=query.doc_type
     )
