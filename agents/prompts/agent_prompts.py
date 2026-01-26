@@ -1,6 +1,7 @@
 from langchain_core.prompts import ChatPromptTemplate
 
-PLANNER_PROMPT = ChatPromptTemplate.from_template("""You are an AI planner for a tax assistant.
+PLANNER_PROMPT = ChatPromptTemplate.from_template(
+    """You are an AI planner for a tax assistant. Decide which tools to use and explain your decision briefly.
 
 Available tools:
 1. Form Document Tool
@@ -26,7 +27,9 @@ Return a JSON plan:
 {{
   "use_form_tool": boolean,
   "use_explainer_tool": boolean,
-  "doc_type": string | null
+  "doc_type": string | null,
+    "justification": string
+
 }}
 
 Question:

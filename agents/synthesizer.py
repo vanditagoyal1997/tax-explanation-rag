@@ -12,9 +12,13 @@ load_dotenv()
 llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 def synthesizer_node(state: GraphState) -> GraphState:
     parts = []
+    trace = state.get("trace", [])
+    reasoning =[]
 
     # factual grounding
     if state.get("fact_results"):
+        # print("Synthesizing factual answer from fact results...")
+        reasoning.append("Using factual results")
         for f in state["fact_results"]:
             f = f.dict()
             parts.append(
@@ -25,6 +29,7 @@ def synthesizer_node(state: GraphState) -> GraphState:
     if state.get("explainer_docs"):
         # print("Synthesizing explanation from explainer docs...")
         # print(state["explainer_docs"])
+        reasoning.append("Using explainer documents")
         context = "\n".join(d.page_content for d in state["explainer_docs"])
         source_pages = "\n ".join(
             f"{d.metadata['doc_id']} (page {d.metadata['page_number']}, section: {d.metadata.get('section_title','N/A')})"
@@ -38,6 +43,11 @@ def synthesizer_node(state: GraphState) -> GraphState:
 
         parts.append(str(explanation.content))
         parts.append(f"(Based on explainer documents: {source_pages})")
+
+    trace.append({
+        "node": "synthesizer",
+        "strategy": ", ".join(reasoning)
+    })
 
     return {
         **state,

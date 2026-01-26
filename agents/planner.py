@@ -19,15 +19,23 @@ def planner_node(state: GraphState) -> GraphState:
     response = chain.invoke({
         "question":state["question"]
     })
-    print("Planner Response:")
+    # print("Planner Response:")
 
     plan_dict = json.loads(response.content)
 
-    print(plan_dict)
+    # print(plan_dict)
 
     plan = ToolPlan(**plan_dict)
 
+    trace = state.get("trace", [])
+    trace.append({
+        "node": "planner",
+        "decision": plan_dict
+    })
+
+
     return {
         **state,
-        "plan": plan
+        "plan": plan,
+        "trace": trace
     }
