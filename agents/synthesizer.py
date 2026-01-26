@@ -23,7 +23,13 @@ def synthesizer_node(state: GraphState) -> GraphState:
 
     # explanation grounding
     if state.get("explainer_docs"):
+        # print("Synthesizing explanation from explainer docs...")
+        # print(state["explainer_docs"])
         context = "\n".join(d.page_content for d in state["explainer_docs"])
+        source_pages = "\n ".join(
+            f"{d.metadata['doc_id']} (page {d.metadata['page_number']}, section: {d.metadata.get('section_title','N/A')})"
+            for d in state["explainer_docs"]
+        )
         chain = SYNTHESIZER_PROMPT | llm
         explanation = chain.invoke({
             "question": state["question"],
@@ -31,6 +37,7 @@ def synthesizer_node(state: GraphState) -> GraphState:
         })
 
         parts.append(str(explanation.content))
+        parts.append(f"(Based on explainer documents: {source_pages})")
 
     return {
         **state,
