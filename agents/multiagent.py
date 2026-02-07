@@ -38,6 +38,12 @@ if __name__ == "__main__":
 
     final_state = app.invoke(initial_state)
 
+    print("Reasoning Trace:")
+    print("---------------")
+    print(final_state["trace"])
+    for step in final_state["trace"]:
+        print(step)
+
     print("Final Answer:")
     print(final_state["answer"])
 
