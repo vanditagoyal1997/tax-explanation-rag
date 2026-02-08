@@ -18,3 +18,7 @@ env/
 Data/
 
 explainer_vectorstore.faiss/
+
+schema_parsed_doc/
+document_index.json
+first_parsed_doc/
